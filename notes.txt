@@ -1,0 +1,69 @@
+LEVELMAP
+.dat file
+
+number - color - connected - one way - which starts one way
+MAP: 1
+//Max number
+5
+//Purple Troll Location
+0
+//Orage Troll Location
+5
+GREEN:
+02
+20
+13
+31
+45
+54
+END
+RED:
+01
+10
+34
+etc.
+
+SCROLLS
+.dat file
+
+SCROLL: 8
+
+VARS
+ACT(4)
+CON(2)
+END
+PATH
+LBL0
+CON0
+Y:
+ACT0
+ACT2
+N:
+ACT1
+ACT2
+END
+CON1
+Y:
+ST0P
+N:
+GOTO0
+END
+
+INPUT
+
+//Example level 51
+//Map #
+1
+//Scroll #
+12
+//Start Location
+4
+//Portal
+0
+//Action Colors
+RGBB
+//Crystal Numbers. If none "NONE"
+055
+//Conditionals. If none "NONE"
+//O is Orange Troll, P is Purple Troll, 2 is 2x, 3 is 3x etc.
+O23
