@@ -13,12 +13,12 @@ actChips = list(splitInput[4])
 conChips = list(splitInput[6])
 #0: Red, 1: Green, 2: Blue
 availableActs = []
+#1 - 6 is Nx crystals, 7 is purple troll, 8 is orange troll
 availableCons = []
 totalActNum = len(actChips)
 totalConNum = len(conChips)
 actOrder = []
 solved = False
-
 
 for i in actChips:
     if i == 'R':
@@ -31,6 +31,19 @@ for i in actChips:
         print("Error: Action Token Invalid")
         print(i)
         exit()
+
+for i in conChips:
+    if i == '1' or i == '2' or i == '3' or i == '4' or i == '5' or i == '6':
+        availableCons.append(int(i))
+    elif i == 'P':
+        availableCons.append(7)
+    elif i == 'O':
+        availableCons.append(8)
+    else:
+        print("Error: Condition Token Invalid")
+        print(i)
+        exit()
+
 #print availableActs
 #ADD CONDITION CHECKING!!!!!!!!!!!
 
