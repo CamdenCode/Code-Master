@@ -11,6 +11,8 @@ scrollNum = int(splitInput[1])
 portalLoc = int(splitInput[3])
 actChips = list(splitInput[4])
 conChips = list(splitInput[6])
+purpleTrolls = []
+orangeTrolls = []
 #0: Red, 1: Green, 2: Blue
 availableActs = []
 #1 - 6 is Nx crystals, 7 is purple troll, 8 is orange troll
@@ -19,6 +21,13 @@ totalActNum = len(actChips)
 totalConNum = len(conChips)
 actOrder = []
 solved = False
+
+#Set trolls
+tempMap = path.split("MAP" + mapNum)[1].splitlines()
+for i in list(tempMap[1]):
+    purpleTrolls.append(i)
+for i in list(tempMap[2]):
+    orangeTrolls.append(i)
 
 for i in actChips:
     if i == 'R':
@@ -66,15 +75,19 @@ def move(color, curPos):
                 return int(list(x)[1])
     return -1
 #Runs Scroll program
-def runProgram(actSequence):
+def runProgram(actSequence, conSequence):
+    labels = []
     actColor = []
+    conProg = []
     crystals = []
+    crystalsFound = 0
     for x in range(len(actSequence)):
         actColor.append(availableActs[actSequence[x]])
+    for x in range(len(conSequence)):
+        conProg.append(availableCons[conSequence[x]])
     if splitInput[5] != "NONE":
         for x in range(len(list(splitInput[5]))):
             crystals.append(list(splitInput[5])[x])
-
     else:
         crystals = []
     curPos = int(splitInput[2])
@@ -84,15 +97,33 @@ def runProgram(actSequence):
     if progActTotal != totalActNum:
         print("Invalid # of Action Tokes")
         exit()
-    for step in program:
-        if "ACT" in step:
+    step = 0
+    while step < len(program):
+        if "LBL" in program[step]:
+            labels.append(step)
+    step = 0
+    while step < len(program):
+        if "ACT" in program[step]:
             #print actColor
-            color = actColor[int(step.split("ACT")[1])]
+            color = actColor[int(program[step].split("ACT")[1])]
             curPos = move(color, curPos)
             for x in crystals:
                 if curPos == int(x):
                     crystals.remove(x)
+                    crystalsFound = crystalsFound + 1
                     break
+        elif "GOTO" in program[step]:
+            step = labels[int(program[step].split("GOTO")[1])]
+        elif "CON" in program[step]:
+            conditionIndex = int(program[step].split("CON")[1])
+            condition = int[conProg[conditionIndex]]
+            #If no, add one to step
+            if condition < 7:
+                if crystalsFound <= condition:
+                    step = step + 1
+            elif condition == 7:
+                if curPos not in
+        step = step + 1
             #print str(curPos) + ":" + str(color)
     if len(crystals) == 0:
         return curPos
