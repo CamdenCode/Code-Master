@@ -23,11 +23,11 @@ actOrder = []
 solved = False
 
 #Set trolls
-tempMap = path.split("MAP" + mapNum)[1].splitlines()
-for i in list(tempMap[1]):
-    purpleTrolls.append(i)
+tempMap = path.split("MAP: " + str(mapNum))[1].splitlines()
 for i in list(tempMap[2]):
-    orangeTrolls.append(i)
+    purpleTrolls.append(int(i))
+for i in list(tempMap[3]):
+    orangeTrolls.append(int(i))
 
 for i in actChips:
     if i == 'R':
@@ -73,13 +73,15 @@ def move(color, curPos):
                 #print curPos
                 #print int(list(x)[1])
                 return int(list(x)[1])
-    return -1
+    return curPos
 #Runs Scroll program
 def runProgram(actSequence, conSequence):
     labels = []
     actColor = []
     conProg = []
     crystals = []
+    past = []
+    visited = 0
     crystalsFound = 0
     for x in range(len(actSequence)):
         actColor.append(availableActs[actSequence[x]])
@@ -101,12 +103,29 @@ def runProgram(actSequence, conSequence):
     while step < len(program):
         if "LBL" in program[step]:
             labels.append(step)
+        step = step + 1
     step = 0
     while step < len(program):
-        if "ACT" in program[step]:
+        #print curPos
+        #print program[step]
+
+        if curPos in past:
+            visited = visited + 1
+        if visited >= 50:
+            return -1
+        if "STOP" in program[step]:
+            if len(crystals) == 0:
+                return curPos
+            else:
+                return -1
+            return curPos
+        elif "ACT" in program[step]:
             #print actColor
             color = actColor[int(program[step].split("ACT")[1])]
             curPos = move(color, curPos)
+            if curPos == -1:
+                return -1
+            past.append(curPos)
             for x in crystals:
                 if curPos == int(x):
                     crystals.remove(x)
@@ -114,21 +133,23 @@ def runProgram(actSequence, conSequence):
                     break
         elif "GOTO" in program[step]:
             step = labels[int(program[step].split("GOTO")[1])]
+
         elif "CON" in program[step]:
             conditionIndex = int(program[step].split("CON")[1])
-            condition = int[conProg[conditionIndex]]
+            condition = int(conProg[conditionIndex])
             #If no, add one to step
             if condition < 7:
-                if crystalsFound <= condition:
+                if crystalsFound < condition:
                     step = step + 1
             elif condition == 7:
-                if curPos not in
+                if curPos not in purpleTrolls:
+                    step = step + 1
+            elif condition == 8:
+                if curPos not in orangeTrolls:
+                    step = step + 1
         step = step + 1
             #print str(curPos) + ":" + str(color)
-    if len(crystals) == 0:
-        return curPos
-    else:
-        return -1
+
 counter = 0
 actColors = []
 
@@ -140,14 +161,31 @@ def randomizeOrder(length):
             futureIndex = random.randrange(0, length)
         order.append(futureIndex)
     return order
-trialOrder = randomizeOrder(len(availableActs))
+
+
+
+trialOrderActs = randomizeOrder(len(availableActs))
+trialOrderCons = randomizeOrder(len(availableCons))
+triedOrderActs = [trialOrderActs]
+triedOrderCons = [trialOrderCons]
+
+
 while not solved:
-    if runProgram(trialOrder) == portalLoc:
+    #print triedOrderActs
+    if runProgram(trialOrderActs, trialOrderCons) == portalLoc:
         solved = True
+        #print runProgram(trialOrderActs, trialOrderCons)
     else:
-        trialOrder = randomizeOrder(len(availableActs))
-for x in range(len(trialOrder)):
-    trialElement = availableActs[trialOrder[x]]
+        while trialOrderActs in triedOrderActs or trialOrderCons in triedOrderActs:
+            trialOrderActs = randomizeOrder(len(availableActs))
+            trialOrderCons = randomizeOrder(len(availableCons))
+        triedOrderActs.append(trialOrderActs)
+        triedOrderCons.append(trialOrderCons)
+        #print triedOrderActs
+        #print triedOrderCons
+
+for x in range(len(trialOrderActs)):
+    trialElement = availableActs[trialOrderActs[x]]
     string = "Act " + str(x) + " = "
     if trialElement == 0:
         string = string + "Red"
@@ -155,4 +193,14 @@ for x in range(len(trialOrder)):
         string = string + "Green"
     else:
         string = string + "Blue"
+    print string
+for x in range(len(trialOrderCons)):
+    trialElement = availableCons[trialOrderCons[x]]
+    string = "Con " + str(x) + " = "
+    if trialElement < 7:
+        string = string + str(trialElement) + "x"
+    elif trialElement == 7:
+        string = string + "Purple"
+    else:
+        string = string + "Orange"
     print string
